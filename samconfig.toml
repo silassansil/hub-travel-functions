@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "hub-travel-functions"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-119tc6hh09bp9"
+s3_prefix = "hub-travel-functions"
+region = "sa-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"

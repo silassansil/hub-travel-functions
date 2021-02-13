@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Functions related to hub travel.
+
+Globals:
+  Function:
+    Timeout: 5
+
+Resources:
+  SharedLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.7
+      ContentUri: shared/
+      Description: Provides the base backend shared library and dependencies
+      LayerName: shared
+
+  BookedExcursionHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/booked_excursion_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Layers:
+        - !Ref SharedLayer
+      Events:
+        BookedExcursionHandler:
+          Type: Api
+          Properties:
+            Path: /excursions
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: 'Excursions'
+
+  RegisterAgencyHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/register_agency_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Layers:
+        - !Ref SharedLayer
+      Events:
+        RegisterAgencyHandler:
+          Type: Api
+          Properties:
+            Path: /agencies
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: 'Agencies'
+
+  UpdateAgencyPartnerHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/update_agency_partner_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Layers:
+        - !Ref SharedLayer
+      Events:
+        UpdateAgencyPartnerHandler:
+          Type: Api
+          Properties:
+            Path: /agencies/{agencyId}/partner
+            Method: put
+          RequestParameters:
+            - method.request.path.agencyId
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: 'Agencies'
+
+  SyncExcursionEngineHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/sync_excursion_engine_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        SyncExcursionEngineHandler:
+          Type: DynamoDB
+          Properties:
+            Stream:
+              Fn::ImportValue: hub-travel-stack-Excursion-StreamArn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 10
