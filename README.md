@@ -1,6 +1,6 @@
-# dynamodb_event_reader
+# hub-travel-functions
 
-Sample SAM Template for dynamodb_event_reader to interact with DynamoDB Events.
+Functions related to hub travel using SAM template
 
 ## Requirements
 

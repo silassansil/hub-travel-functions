@@ -72,6 +72,26 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: 'Agencies'
 
+  FindAgencyByIdHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/find_agency_by_id_handler/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Layers:
+        - !Ref SharedLayer
+      Events:
+        UpdateAgencyPartnerHandler:
+          Type: Api
+          Properties:
+            Path: /agencies/{agencyId}
+            Method: get
+          RequestParameters:
+            - method.request.path.agencyId
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: 'Agencies'
+
   SyncExcursionEngineHandler:
     Type: AWS::Serverless::Function
     Properties:
